@@ -10,7 +10,7 @@
     }
     server {
         listen 80;
-        server_name {{key }};
+        server_name {{key ([]string{.Name, "domain"} | join "/")}};
         location / {
             proxy_pass http://frontends;
         }
