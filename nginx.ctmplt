@@ -1,12 +1,16 @@
+# 每个web站点都注册为一个服务，需要负载均衡的都添加一个tag：web-lb
+# 所有需要负载均衡的web站点都写进配置中
 {{range services}}
-  {{if .Tags | contains "web" }}
+  {{if .Tags | contains "web-lb" }}
     upstream {{.Name}} {
+      {{range service .Name}}
+      server {{.Address}}:{{.Port}}
+      {{end}}
         {{range service "viewer"}}
-        server {{.Address}}:{{.Port}};{{end}} 
     }
     server {
         listen 80;
-        server_name domain;
+        server_name {{key ([]string{.Name, "domain"} | join "/")}};
         location / {
             proxy_pass http://frontends;
         }
